@@ -11,6 +11,8 @@
 #include <util/delay.h>
 
 #include "HT16k33.h"
+#include "ESP8266.h"
+#include "HD44780U.h"
 
 void wait(int ms)
 {
@@ -20,7 +22,7 @@ void wait(int ms)
 	}
 }
 
-void test(void)
+void testDM(void)
 {
 	dm_init();
 	dm_clear();
@@ -50,9 +52,48 @@ void test(void)
 	}
 }
 
+void testESP(void)
+{
+	LCD_set_cursor(0);
+	LCD_display_text("INIT...         ");
+	if (esp_init())
+	{
+		LCD_set_cursor(40);
+		LCD_display_text("OK              ");
+	}
+	else
+	{
+		LCD_set_cursor(40);
+		LCD_display_text("FAILED          ");
+		return;
+	}
+	wait(1000);
+	LCD_set_cursor(0);
+	LCD_display_text("SETTING UP AP...");
+	LCD_set_cursor(40);
+	LCD_display_text("                ");
+	if (esp_setupAP("ESP8266", "qwerty", 14, ESP_ECN_WPA2_PSK, 1, 0))
+	{
+		LCD_set_cursor(40);
+		LCD_display_text("OK              ");
+	}
+	else
+	{
+		LCD_set_cursor(40);
+		LCD_display_text("FAILED          ");
+	}
+}
+
 int main(void)
 {
-	test();
+	#if 0
+	LCD_init();
+	LCD_set_cursor(0);
+	LCD_display_text("TESTING...      ");
+	wait(1000);
+	testESP();
+	#endif
+	testDM();
 	
 	/* Main loop */
 	while (1) {

@@ -9,6 +9,9 @@
 #ifndef TWI_H_
 #define TWI_H_
 
+
+typedef unsigned char u_char;
+
 /* Init TWI for master usage */
 void twi_initMaster(void);
 
@@ -19,6 +22,6 @@ void twi_start(void);
 void twi_stop(void);
 
 /* Transmit */
-void twi_tx(unsigned char data);
+void twi_tx(u_char data);
 
 #endif /* TWI_H_ */

@@ -28,7 +28,7 @@ void twi_stop()
 	TWCR = _BV(TWSTO) | _BV(TWINT) | _BV(TWEN);
 }
 
-void twi_tx(unsigned char data)
+void twi_tx(u_char data)
 {
 	TWDR = data;
 	TWCR = _BV(TWINT) | _BV(TWEN);
