@@ -52,9 +52,11 @@ void dm_setRow(u_char row, u_char dots)
 	twi_stop();
 }
 
-void dm_setDot(u_char x, u_char y, u_char on)
-{
-	// TODO implement
+void dm_setAll(u_char matrix[8]) {
+	int i;
+	for (i = 0; i < 8; i++) {
+		dm_setRow(i, matrix[i]);
+	}
 }
 
 void dm_clear()

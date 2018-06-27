@@ -135,10 +135,7 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="ESP8266.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="ESP8266.h">
+    <Compile Include="font.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="HD44780U.c">
@@ -160,12 +157,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="twi.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="usart.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="usart.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>
