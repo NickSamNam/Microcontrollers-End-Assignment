@@ -14,7 +14,9 @@
 #include "HD44780U.h"
 #include "font.h"
 
-char* text = "According to all known laws of aviation, there is no way a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway because bees don't care what humans think is impossible.";
+char* text = "According to all known laws of aviation, there is no way a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway because bees don't care what humans think is impossible.\n";
+// char* text = "Hello World!\n";
+// char* text = "<";
 
 void wait(int ms)
 {
@@ -31,18 +33,18 @@ int main(void) {
 	
 	u_char display[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 	u_char next_display[8];
-	int text_prog = 0;
+	int text_prog = -1;
 	int char_prog = 8;
 	u_char next_char = '\0';
 	/* Main loop */
 	for(;;) {
 		if (char_prog == 8) {
+			text_prog++;
+			next_char = text[text_prog];
 			if (next_char == '\0') {
 				text_prog = 0;
-			} else {
-				text_prog++;
+				next_char = text[text_prog];
 			}
-			next_char = text[text_prog];
 			memcpy(&next_display, &font[next_char], sizeof font[next_char]);
 			char_prog = 0;
 		}
