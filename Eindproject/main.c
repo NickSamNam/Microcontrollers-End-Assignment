@@ -24,10 +24,6 @@
 #include "pot.h"
 #include "keyboard.h"
 
-// char* text = "According to all known laws of aviation, there is no way a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway because bees don't care what humans think is impossible.\n";
-// char* text = "Hello World!\n";
-// char* text = "<";
-
 void wait(int ms)
 {
 	int i;
@@ -91,24 +87,7 @@ int main(void) {
 			keyboard_timer = 0;
 			int *states[N_KEYS];
 			kb_poll(&states);
-			
-			if (states[KEY_RIGHT] && !states[KEY_LEFT])	{
-				if (entry_pos + 1 < strlen(edit_text)) {
-					LCD_set_char(edit_text[entry_pos]);
-					entry_pos++;
-					selected_char = edit_text[entry_pos];
-					LCD_set_cursor(entry_pos);
-				}
-			}
-			else if (states[KEY_LEFT] && !states[KEY_RIGHT]) {
-				if (entry_pos > 0) {
-					LCD_set_char(edit_text[entry_pos]);
-					entry_pos--;
-					selected_char = edit_text[entry_pos];
-					LCD_set_cursor(entry_pos);
-				}
-			}
-			
+				
 			if (states[KEY_UP] && !states[KEY_DOWN]) {
 				if (selected_char < FIRST_CHAR || selected_char > FINAL_CHAR) selected_char = FIRST_CHAR;
 				else if (selected_char < FINAL_CHAR) selected_char++;
@@ -147,11 +126,10 @@ int main(void) {
 			}
 			
 			if (states[KEY_BACKSPACE]) {
-				memmove(edit_text[entry_pos], edit_text[entry_pos + 1], strlen(edit_text) - entry_pos);
-				if (entry_pos 1 > 0) entry_pos--;
+				edit_text[entry_pos] = '\0';
+				LCD_set_char(' ');
+				if (entry_pos > 0) entry_pos--;
 				selected_char = edit_text[entry_pos];
-				LCD_clear();
-				LCD_display_text(edit_text);
 				LCD_set_cursor(entry_pos);
 			}
 			
@@ -163,6 +141,7 @@ int main(void) {
 				LCD_clear();
 				entry_pos = 0;
 				edit_text[0] = '\0';
+				selected_char = edit_text[entry_pos];
 			}
 		}
 		
