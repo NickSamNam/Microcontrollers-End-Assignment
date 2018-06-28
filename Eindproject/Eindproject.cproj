@@ -135,6 +135,12 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="keyboard.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="keyboard.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="pot.c">
       <SubType>compile</SubType>
     </Compile>

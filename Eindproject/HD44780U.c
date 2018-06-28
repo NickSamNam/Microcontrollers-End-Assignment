@@ -63,7 +63,7 @@ void LCD_init()
 	// Display (display on, cursor off, blinking off)
 	PORTC = 0x00;
 	Exec();
-	PORTC = 0xC0;
+	PORTC = 0xE0;
 	Exec();
 	
 	// Entry mode (right, no shift)
@@ -73,21 +73,40 @@ void LCD_init()
 	Exec();
 }
 
+void LCD_clear() {
+	// Clear display
+	PORTC = 0x00;
+	Exec();
+	PORTC = 0x10;
+	Exec();
+	
+	// Return home
+	PORTC = 0x00;
+	Exec();
+	PORTC = 0x20;
+	Exec();
+}
+
+/* Write a character to the display at the current cursor position. */
+void LCD_set_char(char c)
+{
+	Byte nibble0 = c & 0xF0;
+	Byte nibble1 = (c << 4) & 0xF0;
+	nibble0 |= LCD_RS;
+	nibble1 |= LCD_RS;
+	PORTC = nibble0;
+	Exec(); // execute data write
+	PORTC = nibble1;
+	Exec(); // execute data write
+}
+
 /*	Write text to the display at the current cursor position.	*/
 void LCD_display_text(char* text)
 {
 	int i;
 	for (i = 0; text[i] != '\0'; i++)
 	{
-		char curr = text[i];
-		Byte nibble0 = curr & 0xF0;
-		Byte nibble1 = (curr << 4) & 0xF0;
-		nibble0 |= LCD_RS;
-		nibble1 |= LCD_RS;
-		PORTC = nibble0;
-		Exec(); // execute data write
-		PORTC = nibble1;
-		Exec(); // execute data write
+		LCD_set_char(text[i]);
 	}
 }
 

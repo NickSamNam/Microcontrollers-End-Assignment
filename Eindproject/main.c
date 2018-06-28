@@ -8,6 +8,11 @@
 #define F_CPU 8000000
 
 #define DISPLAY_TIME 25
+#define KEYBOARD_TIME 200
+
+#define FIRST_CHAR '!'
+#define FINAL_CHAR '~'
+#define MAX_N_CHAR 16
 
 #include <avr/io.h>
 #include <util/delay.h>
@@ -17,6 +22,7 @@
 #include "HD44780U.h"
 #include "font.h"
 #include "pot.h"
+#include "keyboard.h"
 
 // char* text = "According to all known laws of aviation, there is no way a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway because bees don't care what humans think is impossible.\n";
 // char* text = "Hello World!\n";
@@ -35,23 +41,31 @@ int main(void) {
 	dm_clear();
 	dm_setBrightness(16);
 	pot_init();
+	kb_init();
+	LCD_init();
 	
-	char* text = strdup("Hello World!\n");
+	char* text[MAX_N_CHAR + 1] = {'\0'};
 	
-	/* Signage display */
-	int displayed_time = DISPLAY_TIME;
+	/* Display */
+	int display_timer = DISPLAY_TIME;
+	int keyboard_timer = 0;
 	u_char display[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 	u_char next_display[8];
 	int text_prog = -1;
 	int char_prog = 8;
 	u_char next_char = '\0';
 	
+	/* Edit */
+	char* edit_text[MAX_N_CHAR + 1] = {'\0'};
+	int entry_pos = 0;
+	u_char selected_char = '\0';
+	
 	/* Main loop */
 	for(;;) {
-		/* Signage display */
-		if (displayed_time >= DISPLAY_TIME * (1 / pot_val()))
+		/* Display */
+		if (display_timer >= DISPLAY_TIME * (1 / pot_val()))
 		{
-			displayed_time = 0;
+			display_timer = 0;
 			if (char_prog == 8) {
 				text_prog++;
 				next_char = text[text_prog];
@@ -72,8 +86,89 @@ int main(void) {
 			dm_setAll(display);
 		}
 		
+		/* Edit */
+		if (keyboard_timer >= KEYBOARD_TIME) {
+			keyboard_timer = 0;
+			int *states[N_KEYS];
+			kb_poll(&states);
+			
+			if (states[KEY_RIGHT] && !states[KEY_LEFT])	{
+				if (entry_pos + 1 < strlen(edit_text)) {
+					LCD_set_char(edit_text[entry_pos]);
+					entry_pos++;
+					selected_char = edit_text[entry_pos];
+					LCD_set_cursor(entry_pos);
+				}
+			}
+			else if (states[KEY_LEFT] && !states[KEY_RIGHT]) {
+				if (entry_pos > 0) {
+					LCD_set_char(edit_text[entry_pos]);
+					entry_pos--;
+					selected_char = edit_text[entry_pos];
+					LCD_set_cursor(entry_pos);
+				}
+			}
+			
+			if (states[KEY_UP] && !states[KEY_DOWN]) {
+				if (selected_char < FIRST_CHAR || selected_char > FINAL_CHAR) selected_char = FIRST_CHAR;
+				else if (selected_char < FINAL_CHAR) selected_char++;
+				LCD_set_char(selected_char);
+				LCD_set_cursor(entry_pos);
+			}
+			else if (states[KEY_DOWN] && !states[KEY_UP]) {
+				if (selected_char < FIRST_CHAR || selected_char > FINAL_CHAR) selected_char = FINAL_CHAR;
+				else if (selected_char > FIRST_CHAR) selected_char--;
+				LCD_set_char(selected_char);
+				LCD_set_cursor(entry_pos);
+			}
+			
+			if (states[KEY_OK]) {
+				if (selected_char >= FIRST_CHAR && selected_char <= FINAL_CHAR)
+				{
+					if (edit_text[entry_pos] == '\0') edit_text[entry_pos + 1] = '\0';
+					edit_text[entry_pos] = selected_char;
+					if (entry_pos < MAX_N_CHAR) {
+						entry_pos++;
+						selected_char = edit_text[entry_pos];
+						LCD_set_cursor(entry_pos);
+					}
+				}
+			}
+			
+			if (states[KEY_SPACE]) {
+				if (edit_text[entry_pos] == '\0') edit_text[entry_pos + 1] = '\0';
+				edit_text[entry_pos] = ' ';
+				LCD_set_char(edit_text[entry_pos]);
+				if (entry_pos < MAX_N_CHAR) {
+					entry_pos++;
+					selected_char = edit_text[entry_pos];
+					LCD_set_cursor(entry_pos);
+				}
+			}
+			
+			if (states[KEY_BACKSPACE]) {
+				memmove(edit_text[entry_pos], edit_text[entry_pos + 1], strlen(edit_text) - entry_pos);
+				if (entry_pos 1 > 0) entry_pos--;
+				selected_char = edit_text[entry_pos];
+				LCD_clear();
+				LCD_display_text(edit_text);
+				LCD_set_cursor(entry_pos);
+			}
+			
+			if (states[KEY_SET]) {
+				memcpy(text, edit_text, sizeof text);
+			}
+			
+			if (states[KEY_RESET]) {
+				LCD_clear();
+				entry_pos = 0;
+				edit_text[0] = '\0';
+			}
+		}
+		
 		/* Timing */
 		wait(1);
-		displayed_time++;
+		display_timer++;
+		keyboard_timer++;
 	}
 }

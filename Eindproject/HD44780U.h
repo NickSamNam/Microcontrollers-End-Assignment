@@ -13,6 +13,10 @@
 /*	Initialise the display.	*/
 void LCD_init(void);
 
+void LCD_clear(void);
+
+void LCD_set_char(char c);
+
 /*	Write text to the display at the current cursor position.	*/
 void LCD_display_text(char* text);
 
