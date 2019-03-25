@@ -44,14 +44,14 @@ int main(void) {
 	
 	/* Display */
 	int display_timer = DISPLAY_TIME;
-	int keyboard_timer = 0;
 	u_char display[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 	u_char next_display[8];
-	int text_prog = -1;
-	int char_prog = 8;
+	int text_prog = 0;
+	int char_prog = 0;
 	u_char next_char = '\0';
 	
 	/* Edit */
+	int keyboard_timer = 0;
 	char* edit_text[MAX_N_CHAR + 1] = {'\0'};
 	int entry_pos = 0;
 	u_char selected_char = '\0';
@@ -62,15 +62,13 @@ int main(void) {
 		if (display_timer >= DISPLAY_TIME * (1 / pot_val()))
 		{
 			display_timer = 0;
-			if (char_prog == 8) {
-				text_prog++;
+			if (char_prog == 0) {
 				next_char = text[text_prog];
-				if (next_char == '\0') {
+				text_prog++;
+				if (text[text_prog] == '\0') {
 					text_prog = 0;
-					next_char = text[text_prog];
 				}
 				memcpy(&next_display, &font[next_char], sizeof font[next_char]);
-				char_prog = 0;
 			}
 			
 			for (int i = 0; i < 8; i++) {
@@ -78,7 +76,7 @@ int main(void) {
 				next_display[i] = next_display[i] >> 1;
 			}
 			
-			char_prog++;
+			char_prog = (char_prog + 1) % 8;
 			dm_setAll(display);
 		}
 		
@@ -135,8 +133,6 @@ int main(void) {
 			
 			if (states[KEY_SET]) {
 				memcpy(text, edit_text, sizeof text);
-				text_prog = -1;
-				char_prog = 8;
 			}
 			
 			if (states[KEY_RESET]) {
