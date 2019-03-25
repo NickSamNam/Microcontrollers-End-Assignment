@@ -104,7 +104,7 @@ int main(void) {
 				{
 					if (edit_text[entry_pos] == '\0') edit_text[entry_pos + 1] = '\0';
 					edit_text[entry_pos] = selected_char;
-					if (entry_pos < MAX_N_CHAR) {
+					if (entry_pos < MAX_N_CHAR - 1) {
 						entry_pos++;
 						selected_char = edit_text[entry_pos];
 						LCD_set_cursor(entry_pos);
@@ -116,11 +116,11 @@ int main(void) {
 				if (edit_text[entry_pos] == '\0') edit_text[entry_pos + 1] = '\0';
 				edit_text[entry_pos] = ' ';
 				LCD_set_char(edit_text[entry_pos]);
-				if (entry_pos < MAX_N_CHAR) {
+				if (entry_pos < MAX_N_CHAR - 1) {
 					entry_pos++;
 					selected_char = edit_text[entry_pos];
-					LCD_set_cursor(entry_pos);
 				}
+				LCD_set_cursor(entry_pos);
 			}
 			
 			if (states[KEY_BACKSPACE]) {
