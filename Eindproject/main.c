@@ -135,6 +135,8 @@ int main(void) {
 			
 			if (states[KEY_SET]) {
 				memcpy(text, edit_text, sizeof text);
+				text_prog = -1;
+				char_prog = 8;
 			}
 			
 			if (states[KEY_RESET]) {
