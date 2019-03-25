@@ -89,13 +89,13 @@ int main(void) {
 			kb_poll(&states);
 				
 			if (states[KEY_UP] && !states[KEY_DOWN]) {
-				if (selected_char < FIRST_CHAR || selected_char > FINAL_CHAR) selected_char = FIRST_CHAR;
+				if (selected_char == FINAL_CHAR || selected_char == '\0') selected_char = FIRST_CHAR;
 				else if (selected_char < FINAL_CHAR) selected_char++;
 				LCD_set_char(selected_char);
 				LCD_set_cursor(entry_pos);
 			}
 			else if (states[KEY_DOWN] && !states[KEY_UP]) {
-				if (selected_char < FIRST_CHAR || selected_char > FINAL_CHAR) selected_char = FINAL_CHAR;
+				if (selected_char == FIRST_CHAR || selected_char == '\0') selected_char = FINAL_CHAR;
 				else if (selected_char > FIRST_CHAR) selected_char--;
 				LCD_set_char(selected_char);
 				LCD_set_cursor(entry_pos);
